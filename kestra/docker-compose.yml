@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  kestra:
+    image: kestra/kestra:latest-full
+    command: server local
+    ports:
+      - "8080:8080"
+    environment:
+      KESTRA_CONFIGURATION: |
+        kestra:
+          storage:
+            type: local
+            local:
+              base-path: /app/storage
+    volumes:
+      # This maps your local storage folder so Kestra can see your scripts/data
+      - ./storage:/app/storage
+      # This mounts your GCP key directly into the container
+      - C:\Users\Nicol\Desktop\Learning\data_engineering_2026\final_project\google_credentials.json:/app/gcp_creds.json

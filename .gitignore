@@ -4,3 +4,5 @@
 *.tfstate.backup
 .env
 data/*
+kestra/storage/data/*
+google_credentials.json
