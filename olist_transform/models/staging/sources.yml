@@ -1,0 +1,21 @@
+version: 2
+
+sources:
+  - name: olist_raw
+    database: infra-vertex-494802-i0  # Replace with your actual project ID
+    schema: raw_ecommerce          # This is the dataset Kestra loaded into
+    tables:
+      - name: customers
+      - name: orders
+        columns: 
+          - name: order_id
+            tests: 
+              - unique
+              - not_null
+      - name: order_items
+      - name: products
+      - name: geolocation
+      - name: order_payments
+      - name: order_reviews
+      - name: sellers
+      - name: product_category_name_translation

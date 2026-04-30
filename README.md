@@ -1,72 +1,53 @@
-# data-engineering-final-project
-DataTalks.Club 2026 data engineering zoomcamp final project
+Olist E-commerce End-to-End Analytics Pipeline
+🚀 Project Overview
+This project demonstrates a full-stack ELT (Extract, Load, Transform) pipeline. It automates the transition of raw e-commerce data into actionable business insights using a modern data stack. The pipeline ingests raw Olist datasets, transforms them into a "Gold" layer for analysis, and visualizes key performance indicators.
 
-第一階段：現代化基礎設施 (IaC & CI/CD)
-任務： 使用 Terraform 建立 GCP 資源。
+🛠️ Tech Stack
+Orchestration: Kestra
 
-改進點：
+Ingestion: Python & dlt (Data Load Tool)
 
-使用 Terraform Modules 模組化資源，並將狀態檔 (State file) 存放在 GCS 中。
+Data Warehouse: Google BigQuery
 
-建立 GitHub Actions 流水線，當你提交代碼時，自動執行 terraform plan 進行校驗。
+Transformation: dbt Core (v1.x)
 
-實踐： 定義兩個 Dataset：raw_ecommerce (存放 dlt 進入的資料) 和 analytics_ecommerce (存放 dbt 建模後的資料)。
+Visualization: Google Looker Studio
 
-第二階段：健壯的資料攝取 (Orchestration & dlt)
-任務： 使用 Kestra 搭配 dlt 進行攝取。
+Infrastructure: Terraform (GCP Provider)
 
-改進點：
+🏗️ Architecture & Workflow
+1. Ingestion (Bronze Layer)
+Using Kestra as the orchestrator, we execute a Python script powered by dlt to ingest raw CSV files from the Olist e-commerce dataset. These are loaded directly into BigQuery as raw, immutable tables.
 
-dlt 原生整合： 使用 dlt 的 google_cloud_storage 來源與 bigquery 目的地。利用 dlt 的 write_disposition='replace' 處理維度表，用 append 處理事實表。
+2. Transformation (Silver & Gold Layers)
+We utilize dbt to manage the transformation layer:
 
-密鑰管理： 在 Kestra 中管理 GCP Service Account Key，不要硬編碼在 Python 中。
+Staging (Silver): Cleaned raw data, renamed columns for consistency, and cast string dates into proper TIMESTAMP formats for time-series analysis.
 
-實際案例： 自動識別 CSV 的數據類型並生成 BigQuery Schema，解決手動定義 Schema 的痛苦。
+Marts (Gold): Created a final Fact table (fct_customer_orders) by joining orders and customer location data to enable geographic sales analysis.
 
-第三階段：效能優化與成本控管 (Data Warehouse Design)
-任務： BigQuery 物理設計。
+3. Data Quality & Documentation
+Testing: Implemented dbt data tests (unique, not_null) to ensure integrity across primary keys.
 
-改進點：
+Lineage: Automated documentation and lineage graphs provided by dbt to track data flow from source to destination.
 
-時間往返查詢： 啟用 Time Travel 功能，防止誤刪數據。
+📊 Business Insights
+The final output is an automated executive dashboard in Looker Studio featuring:
 
-分區鍵優化： 訂單表除了 purchase_timestamp 分區，還可以針對 order_status 進行 Clustering，方便分析師過濾「已完成」的訂單。
+Sales Heatmap: Visualizing order concentration across Brazilian states.
 
-第四階段：精密建模與商業邏輯 (dbt Engineering)
-任務： 實踐 Medallion Architecture (獎章架構)。
+Order Status Distribution: Tracking delivery success vs. cancellation rates.
 
-改進點：
+Growth Trends: Time-series analysis of purchasing behavior.
 
-Bronze (Staging)： stg_orders、stg_customers，僅做重新命名與格式轉換。
+💻 How to Run
+Environment: Set up a Python virtual environment and install dependencies: pip install dbt-bigquery dlt.
 
-Silver (Intermediate)： 處理「一個訂單多個商品」的邏輯，計算每個訂單的總稅額與運費。
+Credentials: Place your GCP Service Account JSON key in the root directory (ensure it is ignored by Git).
 
-Gold (Mart)：
+dbt Setup: Ensure your profiles.yml is configured to point to your BigQuery project.
 
-dim_customers：包含客戶的最後購買日期與活躍度標籤。
+Orchestration: Import the .yaml flow into your Kestra instance and trigger the execution.
 
-fct_order_items：顆粒度到「品項」的銷售事實。
-
-技術亮點： 使用 dbt 的 Macros（例如自定義清理函數）和 Packages（如 dbt_utils）來展現專業度。
-
-第五階段：全方位的資料觀測 (Observability)
-任務： 使用 Bruin 或 dbt tests。
-
-改進點：
-
-測試分級：
-
-Generic Tests： unique, not_null, accepted_values (例如訂單狀態只能是那幾種)。
-
-Singular Tests： 撰寫 SQL 檢查「付款金額是否等於訂單總額」。
-
-數據鮮度 (Freshness)： 檢查資料是否在過去 24 小時內更新過。
-
-第六階段：商業決策儀表板 (BI)
-任務： 視覺化呈現。
-
-改進點：
-
-RFM 分析： 在儀表板呈現客戶的 Recency (近度), Frequency (頻度), Monetary (額度)，這對電商非常有價值。
-
-物流效率分析： 計算「預計送達時間」vs「實際送達時間」的偏差，找出物流瓶頸地區。
+🛡️ Security Note
+This repository follows professional security practices. All sensitive credentials, including profiles.yml and GCP JSON keys, are excluded via .gitignore.
