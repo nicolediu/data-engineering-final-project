@@ -1,53 +1,65 @@
-Olist E-commerce End-to-End Analytics Pipeline
-🚀 Project Overview
-This project demonstrates a full-stack ELT (Extract, Load, Transform) pipeline. It automates the transition of raw e-commerce data into actionable business insights using a modern data stack. The pipeline ingests raw Olist datasets, transforms them into a "Gold" layer for analysis, and visualizes key performance indicators.
+# 🛒 Olist E-commerce End-to-End Analytics Pipeline
+### *An Automated ELT Solution with Kestra, dbt, and BigQuery*
 
-🛠️ Tech Stack
-Orchestration: Kestra
+---
 
-Ingestion: Python & dlt (Data Load Tool)
+## 📖 Project Overview
+This project demonstrates a full-stack **ELT (Extract, Load, Transform)** pipeline designed to turn raw e-commerce data into actionable business insights. By leveraging modern data engineering tools, the pipeline automates the journey from raw CSV ingestion to a high-fidelity executive dashboard.
 
-Data Warehouse: Google BigQuery
+## 🛠️ Tech Stack
+| Layer | Tool | Purpose |
+| :--- | :--- | :--- |
+| **Orchestration** | `Kestra` | Workflow management and automation |
+| **Ingestion** | `Python` & `dlt` | Extracting Olist CSVs and loading to BigQuery |
+| **Warehouse** | `Google BigQuery` | Highly scalable cloud data storage |
+| **Transformation** | `dbt Core` | SQL modeling, casting, and data joins |
+| **Visualization** | `Looker Studio` | Business Intelligence and reporting |
 
-Transformation: dbt Core (v1.x)
+---
 
-Visualization: Google Looker Studio
+## 🏗️ Architecture & Workflow
 
-Infrastructure: Terraform (GCP Provider)
+### 1. Ingestion (**Bronze Layer**)
+The pipeline begins with a **Kestra** flow that triggers a Python script. This script utilizes **dlt** (Data Load Tool) to ingest raw Olist datasets.
+*   **Source:** Raw Olist CSV files (Orders, Customers, Products).
+*   **Destination:** BigQuery raw dataset.
 
-🏗️ Architecture & Workflow
-1. Ingestion (Bronze Layer)
-Using Kestra as the orchestrator, we execute a Python script powered by dlt to ingest raw CSV files from the Olist e-commerce dataset. These are loaded directly into BigQuery as raw, immutable tables.
+### 2. Transformation (**Silver & Gold Layers**)
+We use **dbt** to structure the data into a maintainable hierarchy:
+*   **Staging (Silver):** Cleans raw data and applies critical `CAST` operations to convert string timestamps into proper date objects.
+*   **Marts (Gold):** Aggregates data into a final Fact table (`fct_customer_orders`) for optimized querying.
 
-2. Transformation (Silver & Gold Layers)
-We utilize dbt to manage the transformation layer:
+### 3. Data Quality & Governance
+*   **Testing:** Automated dbt tests ensure `unique` and `not_null` constraints on primary keys.
+*   **Lineage:** The project structure allows for automated documentation and a visual lineage graph of the entire data flow.
 
-Staging (Silver): Cleaned raw data, renamed columns for consistency, and cast string dates into proper TIMESTAMP formats for time-series analysis.
+---
 
-Marts (Gold): Created a final Fact table (fct_customer_orders) by joining orders and customer location data to enable geographic sales analysis.
+## 📊 Business Insights
+The final **Looker Studio** dashboard provides real-time visibility into:
+*   **Geographic Sales:** A heatmap of orders across Brazilian states.
+*   **Operational Health:** Distribution of order statuses (Delivered vs. Canceled).
+*   **Growth Metrics:** Time-series analysis of purchasing volume over time.
 
-3. Data Quality & Documentation
-Testing: Implemented dbt data tests (unique, not_null) to ensure integrity across primary keys.
+## 💻 Setup & Installation
 
-Lineage: Automated documentation and lineage graphs provided by dbt to track data flow from source to destination.
+1.  **Clone the Repository:**
+    ```bash
+    git clone <your-repo-url>
+    ```
+2.  **Install Dependencies:**
+    
+```bash
+    pip install -r requirements.txt
+    ```
+3.  **Configure Profiles:**
+    Ensure your `profiles.yml` is correctly mapped to your **Google Cloud Project ID** and dataset.
+4.  **Run the Pipeline:**
+    Execute the flow via the **Kestra UI** or run `dbt build` in the terminal.
 
-📊 Business Insights
-The final output is an automated executive dashboard in Looker Studio featuring:
+---
 
-Sales Heatmap: Visualizing order concentration across Brazilian states.
+> **Note:** This project was developed in **April 2026** as a final data engineering project focusing on the Olist e-commerce dataset.
 
-Order Status Distribution: Tracking delivery success vs. cancellation rates.
-
-Growth Trends: Time-series analysis of purchasing behavior.
-
-💻 How to Run
-Environment: Set up a Python virtual environment and install dependencies: pip install dbt-bigquery dlt.
-
-Credentials: Place your GCP Service Account JSON key in the root directory (ensure it is ignored by Git).
-
-dbt Setup: Ensure your profiles.yml is configured to point to your BigQuery project.
-
-Orchestration: Import the .yaml flow into your Kestra instance and trigger the execution.
-
-🛡️ Security Note
-This repository follows professional security practices. All sensitive credentials, including profiles.yml and GCP JSON keys, are excluded via .gitignore.
+### 🛡️ Security
+Standard professional security protocols are followed. All sensitive credentials (GCP JSON keys), environment variables, and local virtual environments (`venv/`) are excluded via `.gitignore`.
