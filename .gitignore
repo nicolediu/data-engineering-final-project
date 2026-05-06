@@ -12,3 +12,4 @@ dbt_modules/
 target/
 dbt_env/
 dbt_packages/
+logs/*
