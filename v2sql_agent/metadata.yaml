@@ -1,0 +1,32 @@
+version: 1.0
+dataset_name: raw_ecommerce
+table_name: "`infra-vertex-494802-i0.raw_ecommerce.reporting_master`"
+description: "This table contains denormalized e-commerce data including orders, payments, and product details."
+
+semantic_mapping:
+  - column: payment_value
+    business_name: "Revenue"
+    description: "The total amount paid by the customer for an order."
+    unit: "BRL"
+    
+  - column: order_purchase_timestamp
+    business_name: "Order Date"
+    description: "The date and time when the customer placed the order."
+    
+  - column: product_category_name
+    business_name: "Niche"
+    description: "The category name of the product sold."
+    
+  - column: delivery_time_days
+    business_name: "Shipping Duration"
+    description: "The number of days it took for the product to reach the customer."
+
+  - column: customer_city
+    business_name: "City"
+    description: "The location of the customer."
+
+query_constraints:
+  - "Always group by date using the DATE() function on timestamps."
+  - "Only use the order_status = 'delivered' for revenue calculations."
+  - "Limit all results to top 10 unless specified otherwise."
+  - "Always provide an explicit alias (e.g., AS total_revenue) for any aggregated columns like SUM or AVG."
