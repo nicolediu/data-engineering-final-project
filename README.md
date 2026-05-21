@@ -16,6 +16,8 @@ This project demonstrates a professional-grade **Hybrid Data Pipeline**. It succ
 | **Warehouse** | `Google BigQuery` | Highly scalable cloud data storage (Medallion Schema) |
 | **Transformation** | `dbt Core` | SQL modeling, casting, and data joins |
 | **Visualization** | `Looker Studio` | Business Intelligence and real-time reporting |
+| **AI Translation**| `Google GenAI SDK` | Interfacing with Gemini 2.5 Flash for Text-to-SQL translation |
+| **Audio Processing**| `OpenAI Whisper` | Local speech-to-text transcription of microphone input |
 
 ---
 
@@ -35,6 +37,12 @@ We use **dbt** to structure both historical and live data into a maintainable hi
 * **Latency Monitoring:** Real-time calculation of "Consumer Lag" (the time difference between order creation and warehouse ingestion).
 * **Testing:** Automated dbt tests ensure `unique` and `not_null` constraints on primary keys.
 * **IAM Security:** Implemented the **Principle of Least Privilege** using GCP Service Accounts with granular roles (Pub/Sub Subscriber, BigQuery Data Editor).
+
+### 4. Agentic AI & Natural Language Analytics (Voice-to-SQL)
+* **Semantic Layering:** Implemented a decoupled `metadata.yaml` architecture that maps colloquial business terms (e.g., "Niche", "Revenue") directly to raw BigQuery columns, allowing the LLM to navigate the schema with 100% precision.
+* **Speech-to-Text Processing:** Integrated **OpenAI Whisper (Tiny)** to capture and transcribe local microphone input natively as `float32` arrays, completely bypassing heavy external system dependencies like FFmpeg.
+* **Defensive Engineering:** Authored a custom string-cleansing layer to sanitize incoming text streams and strip out markdown wrapper blocks (` ```sql `), preventing execution-stage syntax errors in the warehouse.
+* **IAM Governance:** Enforced strict cloud security by separating duties, granting the execution service account granular **Vertex AI User** (`roles/aiplatform.user`) permissions only after the data access layer was secure.
 
 ---
 
@@ -66,6 +74,7 @@ The final **Looker Studio** dashboard provides visibility into:
     - **Batch:** Execute the flow via the **Kestra UI**.
     - **Streaming:** Run `python streaming_pipeline/producer_pubsub.py` and `python streaming_pipeline/consumer_live.py` in separate terminals.
     - **Transform:** Run `dbt build` to finalize the Gold layer.
+    - **Voice-to-SQL Agent:** Navigate to the agent directory and run `python v2sql_agent/v2sql_app.py` to query your live BigQuery data warehouse using your voice.
 
 ---
 
